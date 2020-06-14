@@ -1,6 +1,5 @@
 # Dixon Q-Test 
-Read more [here] (https://www.statisticshowto.com/dixons-q-test/)
-
+Read more [here.](https://www.statisticshowto.com/dixons-q-test/)
 ## Arguments:
 data = A ordered or unordered list of data points (int or float).
 left = Q-test of minimum value in the ordered list if True.
@@ -21,8 +20,8 @@ NODE;TIME;DATA TYPE;VALUES
 The important thing is the NODE and the VALUES columns.
 4. Output is a csv file, with seven columns: outlier_no: integer : number of outliers subset_size: integer: the size of the list that contains the numbers that the outlier was found subset: string: the list of numbers NODE: reflects to input file DATA TYPE: reflects to input file index_first_element: integer: within the in memory grouped, subset's starting position index_last_element: integer: within the in memory grouped, subset's finishing position
 
-## date: 14-6-2020
-## author: Kyriakos Vougioukas
-## email: vougioukaskyriakos@live.com
-## github username: boygioykaskyriakos
+### date: 14-6-2020
+### author: Kyriakos Vougioukas
+### email: vougioukaskyriakos@live.com
+### github username: boygioykaskyriakos
 
