@@ -3,13 +3,13 @@ A simple framework that applies the DixtonQ algorithm on integer datasets.
 
 The project contains an .ini file that needs to be configured. 
 
-Input is a csv file, with four column:
+Input is a csv file, with four columns:
 NODE: string
 TIME: integer
 DATA TYPE: string
 VALUES: integer
 
-Output is a csv file, with x columns:
+Output is a csv file, with seven columns:
 outlier_no: integer : number of outliers
 subset_size: integer: the size of the list that contains the numbers that the outlier was found
 subset: string: the list of numbers
