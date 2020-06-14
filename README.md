@@ -1,4 +1,9 @@
 # DixonQ
+# date: 14-6-2020
+# author: Kyriakos Vougioukas
+# email: vougioukaskyriakos@live.com
+# github username: boygioykaskyriakos
+
 A simple framework that applies the DixtonQ algorithm on integer datasets. 
 
 The project contains an .ini file that needs to be configured. 
