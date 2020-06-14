@@ -11,5 +11,6 @@ class SavePdToFile:
 
         full_output_path = "\\".join([self.output_path, self.__class__.__name__ + title + ".csv"])
         df.to_csv(full_output_path, index=False)
+        print(full_output_path + " file saved successfully")
 
         return None
