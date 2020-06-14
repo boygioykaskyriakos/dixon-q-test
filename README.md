@@ -1,4 +1,4 @@
-# DixtonQ
+# DixonQ
 A simple framework that applies the DixtonQ algorithm on integer datasets. 
 
 The project contains an .ini file that needs to be configured. 
