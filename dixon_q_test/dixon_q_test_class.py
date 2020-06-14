@@ -8,14 +8,14 @@ from static_files.standard_variable_names import DATA_TYPE, NODE, VALUES, VALUE,
 
 
 class FindOutlierDixon(BaseClassAnalytic):
+    OUTPUT_COLUMNS = [OUTLIER_NO, SUBSET_SIZE, SUBSET, NODE, DATA_TYPE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT]
+
     def __init__(self, grouped_data: pd.DataFrame):
         BaseClassAnalytic.__init__(self)
 
         self.grouped_data = grouped_data
         self.static_n = self.read_ini_file_obj.get_int("DIXON_Q_TEST_SUBSET_VARIABLES", "static_n")
         self.static_n_maximum = self.read_ini_file_obj.get_int("DIXON_Q_TEST_SUBSET_VARIABLES", "static_n_maximum")
-        self.counter = 0
-        self.result = []
 
     @staticmethod
     def get_result(numbers: pd.Series, comparator: float) -> bool:
@@ -40,34 +40,26 @@ class FindOutlierDixon(BaseClassAnalytic):
 
         return confidence[get_number]
 
-    def print_to_console(self, static_n: int, confidence_lvl: str,
-                         whole_set: pd.DataFrame, temp_data: pd.Series, i: int) -> None:
-
+    @staticmethod
+    def print_to_console(row: dict, confidence_lvl: dict) -> None:
         msg = "*************************************************************************************" + "\n"
-        msg += "OUTLIER FOUND No " + str(self.counter) + "\n"
-        msg += "SUBSET SIZE IS " + str(static_n) + "\n"
-        msg += "NODE IS " + str(whole_set[NODE].values[0]).replace("\t", "") + \
-               " AND DATA TYPE IS " + whole_set[DATA_TYPE].values[0] + "\n"
-        msg += "FIRST ELEMENT INDEX IS " + str(i) + " AND LAST ELEMENT INDEX IS " + str(static_n + i-1) + "\n"
+        msg += "OUTLIER FOUND No " + str(row[OUTLIER_NO]) + "\n"
+        msg += "SUBSET SIZE IS " + row[SUBSET_SIZE] + "\n"
+        msg += "NODE IS " + row[NODE] + " AND DATA TYPE IS " + row[DATA_TYPE] + "\n"
+        msg += "FIRST ELEMENT INDEX IS " + row[INDEX_FIRST_ELEMENT] + \
+               " AND LAST ELEMENT INDEX IS " + row[INDEX_LAST_ELEMENT] + "\n"
         msg += "THE SUB SET IS: " + "\n"
-        msg += str(temp_data.tolist()) + " " + "\n"
-        msg += "WITH " + str(confidence_lvl).upper() + "\n"
+        msg += row[SUBSET] + " " + "\n"
+        msg += "WITH " + str(confidence_lvl[KEY]).upper() + "\n"
         msg += "*************************************************************************************"
 
         print(msg)
 
-    def results_to_list(
-            self, static_n: int, confidence_lvl: str,
-            whole_set: pd.DataFrame, temp_data: pd.Series, i: int) -> None:
-
-        self.counter += 1
-
-        # print results to console if configuration in ini is 1
-        if self.print_debug == 1:
-            self.print_to_console(static_n, confidence_lvl, whole_set, temp_data, i)
+    @staticmethod
+    def results_to_dict(
+            static_n: int, whole_set: pd.DataFrame, temp_data: pd.Series, i: int) -> dict:
 
         temp_dic_res = {
-            OUTLIER_NO: str(self.counter),
             SUBSET_SIZE: str(static_n),
             SUBSET: str(temp_data.tolist()),
             NODE: str(whole_set[NODE].values[0]).replace("\t", ""),
@@ -76,25 +68,46 @@ class FindOutlierDixon(BaseClassAnalytic):
             INDEX_LAST_ELEMENT: str(static_n + i - 1),
 
         }
-        self.result.append(temp_dic_res)
 
-    def get_appropriate_subset(self, static_n: int, whole_set: pd.DataFrame, confidence: dict) -> None:
+        return temp_dic_res
+
+    def get_appropriate_subset(
+            self, static_n: int, whole_set: pd.DataFrame, confidence: dict, result: list) -> list:
+
         test_set = whole_set[VALUES]
 
         # list comprehension with UDF optimized on pd.DataFrame
         # read it like: for i in range if condition is true then print
-        [
-            self.results_to_list(static_n, confidence[KEY], whole_set, test_set[i:i + static_n].sort_values(), i)
+        result += [
+            self.results_to_dict(static_n, whole_set, test_set[i:i + static_n].sort_values(), i)
             for i in range(len(test_set)-static_n)
             if self.get_result(test_set[i:i+static_n],
                                self.find_comparator(test_set[i:i+static_n], confidence[VALUE])) is True
         ]
 
+        return result
+
     def run(self, confidence_level: dict) -> None:
         static_n = copy(self.static_n)
+        final_result = []
+        df = pd.DataFrame(columns=self.OUTPUT_COLUMNS)
+
         while static_n <= self.static_n_maximum:
-            self.grouped_data.apply(lambda grp: self.get_appropriate_subset(static_n, grp, confidence_level))
+            self.grouped_data.apply(
+                lambda grp: self.get_appropriate_subset(static_n, grp, confidence_level, final_result)
+            )
+
             # increment size
             static_n += 1
 
-        self.save_file.run(pd.DataFrame(self.result), confidence_level[KEY])
+        if len(final_result) > 0:
+            for idx, row in enumerate(final_result):
+                row[OUTLIER_NO] = idx+1
+
+            if self.print_debug:
+                for row in final_result:
+                    self.print_to_console(row, confidence_level)
+
+            df = pd.DataFrame(final_result)
+
+        self.save_file.run(df[self.OUTPUT_COLUMNS], confidence_level[KEY])
