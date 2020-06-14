@@ -42,12 +42,11 @@ class FindOutlierDixon(BaseClassAnalytic):
 
     @staticmethod
     def print_to_console(row: dict, confidence_lvl: dict) -> None:
-        msg = "********** OUTLIER No " + str(self.counter) +" *******************" + "\n"
-        msg += "NODE: " + str(whole_set[NODE].values[0]).replace("\t", "") + \
-               ", DATA TYPE [" + whole_set[DATA_TYPE].values[0] + "]\n"
-        msg += "INDEX[" + str(i) + ", " + str(static_n + i-1) + "] = "
-        msg += str(temp_data.tolist()) + " " + "\n"
-        msg += str(confidence_lvl).upper() + ", SUBSET SIZE: " + str(static_n) + "\n"
+        msg = "********** OUTLIER No " + str(row[OUTLIER_NO]) + " *******************" + "\n"
+        msg += "NODE: " + row[NODE] + ", DATA TYPE [" + row[DATA_TYPE] + "]\n"
+        msg += "INDEX[" + row[INDEX_FIRST_ELEMENT] + ", " + row[INDEX_LAST_ELEMENT] + "] = "
+        msg += row[SUBSET] + " " + "\n"
+        msg += confidence_lvl[KEY].upper() + ", SUBSET SIZE: " + row[SUBSET_SIZE] + "\n"
 
         print(msg)
 
