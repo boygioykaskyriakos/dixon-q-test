@@ -1,7 +1,7 @@
 # Dixon Q-Test 
 Read more [here.](https://www.statisticshowto.com/dixons-q-test/)
 ## Arguments:
-data = A ordered or unordered list of data points (int or float).
+data = An ordered or unordered list of data points (int or float).
 left = Q-test of minimum value in the ordered list if True.
 right = Q-test of maximum value in the ordered list if True.
 q_dict = A dictionary of Q-values for a given confidence level, where the dict. keys are sample sizes N, and the associated values are the corresponding critical Q values. E.g., {3: 0.97, 4: 0.829, 5: 0.71, 6: 0.625, ...} (Tables are provided, look [here](https://chem.libretexts.org/Bookshelves/Ancillary_Materials/Reference/Reference_Tables/Analytic_References/Appendix_06%3A_Critical_Values_for_Dixon%E2%80%99s_Q-Test) for details). 
@@ -19,6 +19,11 @@ static_n_maximum = 11
 NODE;TIME;DATA TYPE;VALUES
 The important thing is the NODE and the VALUES columns.
 4. Output is a csv file, with seven columns: outlier_no: integer : number of outliers subset_size: integer: the size of the list that contains the numbers that the outlier was found subset: string: the list of numbers NODE: reflects to input file DATA TYPE: reflects to input file index_first_element: integer: within the in memory grouped, subset's starting position index_last_element: integer: within the in memory grouped, subset's finishing position
+
+### Pseudocode Details
+/* Denominator = (x[n]-x[1] */
+/* Lower Outlier: Q = (x[2]-x[1])/(x[n]-x[1]) */					
+/* Higher Outlier: Q = (x[n]-x[n-1])/(x[n]-x[1]) */
 
 ### date: 14-6-2020
 ### author: Kyriakos Vougioukas
