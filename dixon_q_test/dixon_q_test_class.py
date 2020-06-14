@@ -42,16 +42,12 @@ class FindOutlierDixon(BaseClassAnalytic):
 
     @staticmethod
     def print_to_console(row: dict, confidence_lvl: dict) -> None:
-        msg = "*************************************************************************************" + "\n"
-        msg += "OUTLIER FOUND No " + str(row[OUTLIER_NO]) + "\n"
-        msg += "SUBSET SIZE IS " + row[SUBSET_SIZE] + "\n"
-        msg += "NODE IS " + row[NODE] + " AND DATA TYPE IS " + row[DATA_TYPE] + "\n"
-        msg += "FIRST ELEMENT INDEX IS " + row[INDEX_FIRST_ELEMENT] + \
-               " AND LAST ELEMENT INDEX IS " + row[INDEX_LAST_ELEMENT] + "\n"
-        msg += "THE SUB SET IS: " + "\n"
-        msg += row[SUBSET] + " " + "\n"
-        msg += "WITH " + str(confidence_lvl[KEY]).upper() + "\n"
-        msg += "*************************************************************************************"
+        msg = "********** OUTLIER No " + str(self.counter) +" *******************" + "\n"
+        msg += "NODE: " + str(whole_set[NODE].values[0]).replace("\t", "") + \
+               ", DATA TYPE [" + whole_set[DATA_TYPE].values[0] + "]\n"
+        msg += "INDEX[" + str(i) + ", " + str(static_n + i-1) + "] = "
+        msg += str(temp_data.tolist()) + " " + "\n"
+        msg += str(confidence_lvl).upper() + ", SUBSET SIZE: " + str(static_n) + "\n"
 
         print(msg)
 
