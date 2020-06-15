@@ -6,6 +6,7 @@ from utilities.log_module import Logger
 class SavePdToFile:
     def __init__(self, output_path):
         self.output_path = output_path
+        self.logger = Logger()
 
     def run(self, df: pd.DataFrame, title=""):
         if title != "":
@@ -15,6 +16,7 @@ class SavePdToFile:
         # lower columns
         df.columns = df.columns.str.lower()
         df.to_csv(full_output_path, index=False)
-        Logger.info(full_output_path + " file saved successfully")
+
+        self.logger.info(full_output_path + " file saved successfully")
 
         return None
