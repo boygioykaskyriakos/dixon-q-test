@@ -10,6 +10,7 @@ from static_files.standard_variable_names import DATA_TYPE, NODE, VALUES, VALUE,
 class FindOutlierDixon(BaseClassAnalytic):
     OUTPUT_COLUMNS = [OUTLIER_NO, SUBSET_SIZE, SUBSET, NODE, DATA_TYPE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT]
     OUTPUT_COLUMNS_METRICS = [NODE, DATA_TYPE, OUTLIER_NO]
+    OUTPUT_COLUMNS_METRICS_CRITICAL = [SUBSET_SIZE, SUBSET, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT, OUTLIER_NO]
 
     def __init__(self, grouped_data: pd.DataFrame):
         BaseClassAnalytic.__init__(self)
@@ -17,6 +18,7 @@ class FindOutlierDixon(BaseClassAnalytic):
         self.grouped_data = grouped_data
         self.static_n = self.read_ini_file_obj.get_int("DIXON_Q_TEST_SUBSET_VARIABLES", "static_n")
         self.static_n_maximum = self.read_ini_file_obj.get_int("DIXON_Q_TEST_SUBSET_VARIABLES", "static_n_maximum")
+        self.critical_value = self.read_ini_file_obj.get_int("DIXON_Q_TEST_SUBSET_VARIABLES", "critical_value")
 
     @staticmethod
     def get_result(numbers: pd.Series, comparator: float) -> bool:
@@ -83,19 +85,29 @@ class FindOutlierDixon(BaseClassAnalytic):
         return result
 
     def run(self, confidence_level: dict) -> None:
+        """
+        The main method of the class that saves to file the outliers according the dixon-q-test algorithm
+
+        :param confidence_level: dict: as key contains the title of the confidence
+        and as values contains the dixon-q-test comparator values
+        :return: None
+        """
+
+        # initialize local variables
         static_n = copy(self.static_n)
         final_result = []
         df = pd.DataFrame(columns=self.OUTPUT_COLUMNS)
         df_metrics = pd.DataFrame(columns=self.OUTPUT_COLUMNS_METRICS)
+        df_metrics_critical = pd.DataFrame(columns=self.OUTPUT_COLUMNS_METRICS_CRITICAL)
 
+        # apply logic main loop
         while static_n <= self.static_n_maximum:
             self.grouped_data.apply(
                 lambda grp: self.get_appropriate_subset(static_n, grp, confidence_level, final_result)
             )
-
-            # increment size
             static_n += 1
 
+        # create results
         if len(final_result) > 0:
             for idx, row in enumerate(final_result):
                 row[OUTLIER_NO] = idx+1
@@ -106,6 +118,16 @@ class FindOutlierDixon(BaseClassAnalytic):
 
             df = pd.DataFrame(final_result)
             df_metrics = df[self.OUTPUT_COLUMNS_METRICS].groupby([NODE, DATA_TYPE]).count().reset_index()
+            df_metrics_critical = \
+                df[self.OUTPUT_COLUMNS].groupby(
+                    [SUBSET_SIZE, SUBSET, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT]
+                ).count().reset_index()
+            df_metrics_critical = df_metrics_critical[df_metrics_critical[OUTLIER_NO] > self.critical_value]
 
+        # save results to files
         self.save_file.run(df[self.OUTPUT_COLUMNS], confidence_level[KEY])
         self.save_file.run(df_metrics[self.OUTPUT_COLUMNS_METRICS], confidence_level[KEY] + "_metrics")
+        self.save_file.run(
+            df_metrics_critical[self.OUTPUT_COLUMNS_METRICS_CRITICAL], confidence_level[KEY] + "_metrics_critical"
+        )
+
