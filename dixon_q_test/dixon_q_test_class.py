@@ -10,7 +10,7 @@ from static_files.standard_variable_names import DATA_TYPE, NODE, VALUES, VALUE,
 class FindOutlierDixon(BaseClassAnalytic):
     OUTPUT_COLUMNS = [OUTLIER_NO, SUBSET_SIZE, SUBSET, NODE, DATA_TYPE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT]
     OUTPUT_COLUMNS_METRICS = [NODE, DATA_TYPE, OUTLIER_NO]
-    OUTPUT_COLUMNS_METRICS_CRITICAL = [SUBSET_SIZE, SUBSET, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT, OUTLIER_NO]
+    OUTPUT_COLUMNS_METRICS_CRITICAL = [SUBSET_SIZE, OUTLIER_NO]
 
     def __init__(self, grouped_data: pd.DataFrame):
         BaseClassAnalytic.__init__(self)
@@ -120,9 +120,10 @@ class FindOutlierDixon(BaseClassAnalytic):
             df_metrics = df[self.OUTPUT_COLUMNS_METRICS].groupby([NODE, DATA_TYPE]).count().reset_index()
             df_metrics_critical = \
                 df[self.OUTPUT_COLUMNS].groupby(
-                    [SUBSET_SIZE, SUBSET, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT]
+                    [SUBSET_SIZE, NODE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT]
                 ).count().reset_index()
             df_metrics_critical = df_metrics_critical[df_metrics_critical[OUTLIER_NO] > self.critical_value]
+            df_metrics_critical = df_metrics_critical.groupby(SUBSET_SIZE)[OUTLIER_NO].sum().reset_index()
 
         # save results to files
         self.save_file.run(df[self.OUTPUT_COLUMNS], confidence_level[KEY])
