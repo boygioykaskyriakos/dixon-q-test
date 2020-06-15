@@ -1,5 +1,6 @@
 import logging
 import os
+import inspect
 
 from utilities.read_ini_file import ReadIniFile
 from static_files.standard_variable_names import GLOBALS, OUTPUT_PATH, LOG_FILE_NAME
@@ -24,34 +25,45 @@ class Logger:
     )
 
     # set up logging to console
-    console = logging.StreamHandler()
-    console.setLevel(logging.INFO)
-    # set a format which is simpler for console use
-    formatter = logging.Formatter('%(levelname)-8s %(asctime)s \n %(message)s ')
-    console.setFormatter(formatter)
-    # add the handler to the root logger
-    logging.getLogger('').addHandler(console)
-
-    logger = logging.getLogger(__name__)
-
-    @classmethod
-    def set_formatter(cls, formatter):
-        cls.console.setFormatter(formatter)
-        # add the handler to the root logger
-        logging.getLogger('').addHandler(cls.console)
-        cls.logger = logging.getLogger(__name__)
+    file_handler = logging.FileHandler(filename_output, "w")
+    file_handler.setLevel(logging.INFO)
+    # # set up logging to console
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.INFO)
+    # # set a format which is simpler for console use
+    # formatter = logging.Formatter('%(levelname)-8s %(asctime)s \n %(message)s ')
+    # file_handler.setFormatter(formatter)
+    # stream_handler.setFormatter(formatter)
+    # # add the handler to the root logger
+    logging.getLogger('').addHandler(file_handler)
+    logging.getLogger('').addHandler(stream_handler)
+    logger = logging.getLogger("")
 
     @classmethod
-    def check_for_new_line(cls, content):
+    def get_class_function_name(cls):
+        class_function_name = []
+        stack = inspect.stack()
+
+        for row in stack:
+            if "self" in row[0].f_locals.keys():
+                class_function_name.append(".".join([row[0].f_locals["self"].__class__.__name__, row.function]))
+
+        return " in ".join(class_function_name)
+
+    @classmethod
+    def set_formatter(cls, content):
+        class_function_name = cls.get_class_function_name()
+
         if "\n" not in content:
-            formatter = logging.Formatter('%(levelname)-8s %(asctime)s  %(message)s ')
+            formatter = logging.Formatter('%(levelname)-8s %(asctime)s  ' + class_function_name + '   %(message)s ')
         else:
-            formatter = logging.Formatter('%(levelname)-8s %(asctime)s \n %(message)s ')
+            formatter = logging.Formatter('%(levelname)-8s %(asctime)s  ' + class_function_name + '   \n %(message)s ')
 
-        cls.set_formatter(formatter)
+        cls.file_handler.setFormatter(formatter)
+        cls.stream_handler.setFormatter(formatter)
 
     @classmethod
     def info(cls, content):
-        cls.check_for_new_line(content)
+        cls.set_formatter(content)
         cls.logger.info(content)
 
