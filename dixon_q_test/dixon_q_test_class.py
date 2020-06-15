@@ -4,7 +4,7 @@ from copy import copy
 
 from base_class.base_class_analytic import BaseClassAnalytic
 from static_files.standard_variable_names import DATA_TYPE, NODE, VALUES, VALUE, KEY, \
-    OUTLIER_NO, SUBSET, SUBSET_SIZE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT, CONFIDENCE_LVL
+    OUTLIER_NO, SUBSET, SUBSET_SIZE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT
 
 
 class FindOutlierDixon(BaseClassAnalytic):
@@ -106,7 +106,7 @@ class FindOutlierDixon(BaseClassAnalytic):
                     self.print_to_console(row, confidence_level)
 
             df = pd.DataFrame(final_result)
-            df_metrics = df[[NODE, DATA_TYPE, OUTLIER_NO]].groupby([NODE, DATA_TYPE]).count().reset_index()
+            df_metrics = df[self.OUTPUT_COLUMNS_METRICS].groupby([NODE, DATA_TYPE]).count().reset_index()
 
         self.save_file.run(df[self.OUTPUT_COLUMNS], confidence_level[KEY])
         self.save_file.run(df_metrics[self.OUTPUT_COLUMNS_METRICS], confidence_level[KEY] + "_metrics")

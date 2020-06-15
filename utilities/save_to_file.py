@@ -10,6 +10,8 @@ class SavePdToFile:
             title = "_".join([title])
 
         full_output_path = "\\".join([self.output_path, self.__class__.__name__ + title + ".csv"])
+        # lower columns
+        df.columns = df.columns.str.lower()
         df.to_csv(full_output_path, index=False)
         print(full_output_path + " file saved successfully")
 
