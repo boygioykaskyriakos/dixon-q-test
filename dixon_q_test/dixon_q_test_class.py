@@ -9,6 +9,7 @@ from static_files.standard_variable_names import DATA_TYPE, NODE, VALUES, VALUE,
 
 class FindOutlierDixon(BaseClassAnalytic):
     OUTPUT_COLUMNS = [OUTLIER_NO, SUBSET_SIZE, SUBSET, NODE, DATA_TYPE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT]
+    OUTPUT_COLUMNS_METRICS = [NODE, DATA_TYPE, OUTLIER_NO]
 
     def __init__(self, grouped_data: pd.DataFrame):
         BaseClassAnalytic.__init__(self)
@@ -86,6 +87,7 @@ class FindOutlierDixon(BaseClassAnalytic):
         static_n = copy(self.static_n)
         final_result = []
         df = pd.DataFrame(columns=self.OUTPUT_COLUMNS)
+        df_metrics = pd.DataFrame(columns=self.OUTPUT_COLUMNS_METRICS)
 
         while static_n <= self.static_n_maximum:
             self.grouped_data.apply(
@@ -104,5 +106,7 @@ class FindOutlierDixon(BaseClassAnalytic):
                     self.print_to_console(row, confidence_level)
 
             df = pd.DataFrame(final_result)
+            df_metrics = df[[NODE, DATA_TYPE, OUTLIER_NO]].groupby([NODE, DATA_TYPE]).count().reset_index()
 
         self.save_file.run(df[self.OUTPUT_COLUMNS], confidence_level[KEY])
+        self.save_file.run(df_metrics[self.OUTPUT_COLUMNS_METRICS], confidence_level[KEY] + "_metrics")
