@@ -21,13 +21,23 @@ class FindOutlierDixon(BaseClassAnalytic):
         self.critical_value = self.read_ini_file_obj.get_int("DIXON_Q_TEST_SUBSET_VARIABLES", "critical_value")
 
     @staticmethod
-    def get_result(numbers: pd.Series, comparator: float) -> bool:
+    def dixon_q_test_algo(numbers: pd.Series, comparator: float) -> bool:
+        """
+        Dixon q test method reflects the exact dixon q test algorithm
+
+        :param numbers: list : the subset to examine if it contains outliers
+        :param comparator: float: the value to compare for outliers according the dixon-q-test algorithm
+        :return: bool: True or False
+        """
+
+        # initialize local variables
         numbers = copy(numbers).sort_values().to_list()
 
         q_lower = 0
         q_upper = 0
         denominator = float(numbers[-1]-numbers[0])
 
+        # apply dixon q test algorithm logic
         if denominator > 0:
             q_lower = float(numbers[1] - numbers[0]) / denominator
             q_upper = float(numbers[-1] - numbers[-2]) / denominator
@@ -78,8 +88,8 @@ class FindOutlierDixon(BaseClassAnalytic):
         result += [
             self.results_to_dict(static_n, whole_set, test_set[i:i + static_n].sort_values(), i)
             for i in range(len(test_set)-static_n)
-            if self.get_result(test_set[i:i+static_n],
-                               self.find_comparator(test_set[i:i+static_n], confidence[VALUE])) is True
+            if self.dixon_q_test_algo(test_set[i:i + static_n],
+                                      self.find_comparator(test_set[i:i+static_n], confidence[VALUE])) is True
         ]
 
         return result
