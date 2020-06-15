@@ -8,11 +8,10 @@ from static_files.standard_variable_names import GLOBALS, OUTPUT_PATH, PRINT_DEB
 
 
 class BaseClassAnalytic(object):
-    def __init__(self):
-        self.read_ini_file_obj = ReadIniFile()
-        self.save_file = SavePdToFile(self.read_ini_file_obj.get_str(GLOBALS, OUTPUT_PATH))
-        self.print_debug = self.read_ini_file_obj.get_int(GLOBALS, PRINT_DEBUG)
-        self.logger = Logger()
+    read_ini_file_obj = ReadIniFile()
+    save_file = SavePdToFile(read_ini_file_obj.get_str(GLOBALS, OUTPUT_PATH))
+    print_debug = read_ini_file_obj.get_int(GLOBALS, PRINT_DEBUG)
+    logger = Logger()
 
     @abc.abstractmethod
     def run(self, *args):
