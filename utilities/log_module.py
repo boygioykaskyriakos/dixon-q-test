@@ -1,5 +1,5 @@
 import logging
-import sys
+import os
 
 from utilities.read_ini_file import ReadIniFile
 from static_files.standard_variable_names import GLOBALS, OUTPUT_PATH, LOG_FILE_NAME
@@ -7,7 +7,12 @@ from static_files.standard_variable_names import GLOBALS, OUTPUT_PATH, LOG_FILE_
 
 class Logger:
     read_ini_file_obj = ReadIniFile()
-    filename_output = "\\".join([read_ini_file_obj.get_str(GLOBALS, OUTPUT_PATH), LOG_FILE_NAME + ".log"])
+    file_folder_path = read_ini_file_obj.get_str(GLOBALS, OUTPUT_PATH)
+
+    if not os.path.exists(file_folder_path):
+        os.makedirs(file_folder_path)
+
+    filename_output = "\\".join([file_folder_path, LOG_FILE_NAME + ".log"])
 
     # set up logging to file
     logging.basicConfig(
