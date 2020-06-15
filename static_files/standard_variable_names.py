@@ -2,6 +2,7 @@ GLOBALS = "GLOBALS"
 PRINT_DEBUG = "print_debug"
 MAIN_CONFIG = "config_files\\config_file.ini"
 OUTPUT_PATH = "output_path"
+LOG_FILE_NAME = "logs"
 
 KEY = "key"
 VALUE = "value"

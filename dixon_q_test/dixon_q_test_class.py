@@ -41,15 +41,14 @@ class FindOutlierDixon(BaseClassAnalytic):
 
         return confidence[get_number]
 
-    @staticmethod
-    def print_to_console(row: dict, confidence_lvl: dict) -> None:
+    def print_to_console(self, row: dict, confidence_lvl: dict) -> None:
         msg = "********** OUTLIER No " + str(row[OUTLIER_NO]) + " *******************" + "\n"
         msg += "NODE: " + row[NODE] + ", DATA TYPE [" + row[DATA_TYPE] + "]\n"
         msg += "INDEX[" + row[INDEX_FIRST_ELEMENT] + ", " + row[INDEX_LAST_ELEMENT] + "] = "
         msg += row[SUBSET] + " " + "\n"
         msg += confidence_lvl[KEY].upper() + ", SUBSET SIZE: " + row[SUBSET_SIZE] + "\n"
 
-        print(msg)
+        self.logger.info(msg)
 
     @staticmethod
     def results_to_dict(

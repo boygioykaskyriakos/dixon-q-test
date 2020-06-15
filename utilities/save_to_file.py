@@ -1,5 +1,7 @@
 import pandas as pd
 
+from utilities.log_module import Logger
+
 
 class SavePdToFile:
     def __init__(self, output_path):
@@ -13,6 +15,6 @@ class SavePdToFile:
         # lower columns
         df.columns = df.columns.str.lower()
         df.to_csv(full_output_path, index=False)
-        print(full_output_path + " file saved successfully")
+        Logger.info(full_output_path + " file saved successfully")
 
         return None
