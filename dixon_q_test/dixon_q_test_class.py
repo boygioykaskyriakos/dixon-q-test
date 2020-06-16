@@ -9,7 +9,7 @@ from static_files.standard_variable_names import DATA_TYPE, NODE, VALUES, VALUE,
 
 class FindOutlierDixon(BaseClassAnalytic):
     OUTPUT_COLUMNS = [OUTLIER_NO, SUBSET_SIZE, SUBSET, NODE, DATA_TYPE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT]
-    OUTPUT_COLUMNS_METRICS = [SUBSET_SIZE, NODE, DATA_TYPE, OUTLIER_NO]
+    OUTPUT_COLUMNS_METRICS = [SUBSET_SIZE, OUTLIER_NO]
     OUTPUT_COLUMNS_METRICS_CRITICAL = [SUBSET_SIZE, TOTAL_PANICS]
 
     def __init__(self, grouped_data: pd.DataFrame):
@@ -140,12 +140,12 @@ class FindOutlierDixon(BaseClassAnalytic):
                     self.print_to_console(row, confidence_level)
 
             df = pd.DataFrame(final_result)
-            df_metrics = df.groupby([SUBSET_SIZE, NODE, DATA_TYPE]).count().reset_index()
+            df_metrics = df.groupby([SUBSET_SIZE]).count().reset_index()
             df_metrics_critical = self.format_metrics_critical(df)
 
         # save results to files
-        self.save_file.run(df[self.OUTPUT_COLUMNS], confidence_level[KEY])
-        self.save_file.run(df_metrics[self.OUTPUT_COLUMNS_METRICS], confidence_level[KEY] + "_metrics")
+        self.save_file.run(df[self.OUTPUT_COLUMNS], confidence_level[KEY] + "_metrics_details")
+        self.save_file.run(df_metrics[self.OUTPUT_COLUMNS_METRICS], confidence_level[KEY] + "_metrics_summary")
         self.save_file.run(
             df_metrics_critical[self.OUTPUT_COLUMNS_METRICS_CRITICAL], confidence_level[KEY] + "_metrics_critical"
         )
