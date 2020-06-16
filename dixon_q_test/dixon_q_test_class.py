@@ -79,14 +79,14 @@ class FindOutlierDixon(BaseClassAnalytic):
         return temp_dic_res
 
     def get_appropriate_subset(
-            self, static_n: int, whole_set: pd.DataFrame, confidence: dict, result: list) -> list:
+            self, static_n: int, grp: pd.DataFrame, confidence: dict, result: list) -> list:
 
-        test_set = whole_set[VALUES]
+        test_set = grp[VALUES]
 
         # list comprehension with UDF optimized on pd.DataFrame
         # read it like: for i in range if condition is true then print
         result += [
-            self.results_to_dict(static_n, whole_set, test_set[i:i + static_n].sort_values(), i)
+            self.results_to_dict(static_n, grp, test_set[i:i + static_n].sort_values(), i)
             for i in range(len(test_set)-static_n)
             if self.dixon_q_test_algo(test_set[i:i + static_n],
                                       self.find_comparator(test_set[i:i+static_n], confidence[VALUE])) is True
@@ -127,11 +127,12 @@ class FindOutlierDixon(BaseClassAnalytic):
                     self.print_to_console(row, confidence_level)
 
             df = pd.DataFrame(final_result)
-            df_metrics = df[self.OUTPUT_COLUMNS_METRICS].groupby([NODE, DATA_TYPE]).count().reset_index()
-            df_metrics_critical = \
-                df[self.OUTPUT_COLUMNS].groupby(
-                    [SUBSET_SIZE, NODE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT]
-                ).count().reset_index()
+            df_metrics = df.groupby([NODE, DATA_TYPE]).count().reset_index()
+
+            df_metrics_critical = df.groupby(
+                [SUBSET_SIZE, NODE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT]
+            ).count().reset_index()
+
             df_metrics_critical = df_metrics_critical[df_metrics_critical[OUTLIER_NO] > self.critical_value]
             df_metrics_critical = df_metrics_critical.groupby(SUBSET_SIZE)[OUTLIER_NO].sum().reset_index()
 
