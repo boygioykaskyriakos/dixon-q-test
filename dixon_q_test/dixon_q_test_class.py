@@ -4,13 +4,13 @@ from copy import copy
 
 from base_class.base_class_analytic import BaseClassAnalytic
 from static_files.standard_variable_names import DATA_TYPE, NODE, VALUES, VALUE, KEY, \
-    OUTLIER_NO, SUBSET, SUBSET_SIZE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT
+    OUTLIER_NO, SUBSET, SUBSET_SIZE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT, TOTAL_PANICS
 
 
 class FindOutlierDixon(BaseClassAnalytic):
     OUTPUT_COLUMNS = [OUTLIER_NO, SUBSET_SIZE, SUBSET, NODE, DATA_TYPE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT]
-    OUTPUT_COLUMNS_METRICS = [NODE, DATA_TYPE, OUTLIER_NO]
-    OUTPUT_COLUMNS_METRICS_CRITICAL = [SUBSET_SIZE, OUTLIER_NO]
+    OUTPUT_COLUMNS_METRICS = [SUBSET_SIZE, NODE, DATA_TYPE, OUTLIER_NO]
+    OUTPUT_COLUMNS_METRICS_CRITICAL = [SUBSET_SIZE, TOTAL_PANICS]
 
     def __init__(self, grouped_data: pd.DataFrame):
         BaseClassAnalytic.__init__(self)
@@ -94,6 +94,20 @@ class FindOutlierDixon(BaseClassAnalytic):
 
         return result
 
+    def format_metrics_critical(self, df: pd.DataFrame):
+        df = df.groupby(
+            [SUBSET_SIZE, NODE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT]
+        ).count().reset_index()
+
+        df = df[df[OUTLIER_NO] > self.critical_value]
+        df = df.groupby(SUBSET_SIZE)[OUTLIER_NO].sum().reset_index()
+        df[OUTLIER_NO] = df[OUTLIER_NO] / 2
+        df[OUTLIER_NO] = df[OUTLIER_NO].astype(int)
+        df = df.rename(columns={OUTLIER_NO: TOTAL_PANICS})
+
+        return df
+
+
     def run(self, confidence_level: dict) -> None:
         """
         The main method of the class that saves to file the outliers according the dixon-q-test algorithm
@@ -127,15 +141,9 @@ class FindOutlierDixon(BaseClassAnalytic):
                     self.print_to_console(row, confidence_level)
 
             df = pd.DataFrame(final_result)
-            df_metrics = df.groupby([NODE, DATA_TYPE]).count().reset_index()
-
-            df_metrics_critical = df.groupby(
-                [SUBSET_SIZE, NODE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT]
-            ).count().reset_index()
-
-            df_metrics_critical = df_metrics_critical[df_metrics_critical[OUTLIER_NO] > self.critical_value]
-            df_metrics_critical = df_metrics_critical.groupby(SUBSET_SIZE)[OUTLIER_NO].sum().reset_index()
-
+            df_metrics = df.groupby([SUBSET_SIZE, NODE, DATA_TYPE]).count().reset_index()
+            df_metrics_critical = self.format_metrics_critical(df)
+            
         # save results to files
         self.save_file.run(df[self.OUTPUT_COLUMNS], confidence_level[KEY])
         self.save_file.run(df_metrics[self.OUTPUT_COLUMNS_METRICS], confidence_level[KEY] + "_metrics")
