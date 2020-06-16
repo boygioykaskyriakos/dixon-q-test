@@ -94,7 +94,7 @@ class FindOutlierDixon(BaseClassAnalytic):
 
         return result
 
-    def format_metrics_critical(self, df: pd.DataFrame):
+    def format_metrics_critical(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.groupby(
             [SUBSET_SIZE, NODE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT]
         ).count().reset_index()
@@ -106,7 +106,6 @@ class FindOutlierDixon(BaseClassAnalytic):
         df = df.rename(columns={OUTLIER_NO: TOTAL_PANICS})
 
         return df
-
 
     def run(self, confidence_level: dict) -> None:
         """
@@ -143,7 +142,7 @@ class FindOutlierDixon(BaseClassAnalytic):
             df = pd.DataFrame(final_result)
             df_metrics = df.groupby([SUBSET_SIZE, NODE, DATA_TYPE]).count().reset_index()
             df_metrics_critical = self.format_metrics_critical(df)
-            
+
         # save results to files
         self.save_file.run(df[self.OUTPUT_COLUMNS], confidence_level[KEY])
         self.save_file.run(df_metrics[self.OUTPUT_COLUMNS_METRICS], confidence_level[KEY] + "_metrics")
