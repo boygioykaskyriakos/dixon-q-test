@@ -87,7 +87,7 @@ class FindOutlierDixon(BaseClassAnalytic):
         # read it like: for i in range if condition is true then print
         result += [
             self.results_to_dict(static_n, grp, test_set[i:i + static_n].sort_values(), i)
-            for i in range(len(test_set)-static_n)
+            for i in range(len(test_set)-static_n + 1)
             if self.dixon_q_test_algo(test_set[i:i + static_n],
                                       self.find_comparator(test_set[i:i+static_n], confidence[VALUE])) is True
         ]
