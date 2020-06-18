@@ -71,8 +71,8 @@ class FindOutlierDixon(BaseClassAnalytic):
             SUBSET: str(temp_data.tolist()),
             NODE: str(whole_set[NODE].values[0]).replace("\t", ""),
             DATA_TYPE: whole_set[DATA_TYPE].values[0],
-            INDEX_FIRST_ELEMENT: str(i),
-            INDEX_LAST_ELEMENT: str(static_n + i - 1),
+            INDEX_FIRST_ELEMENT: str(i+static_n),
+            INDEX_LAST_ELEMENT: str(i + 2*static_n - 1),
 
         }
 
@@ -86,10 +86,12 @@ class FindOutlierDixon(BaseClassAnalytic):
         # list comprehension with UDF optimized on pd.DataFrame
         # read it like: for i in range if condition is true then print
         result += [
-            self.results_to_dict(static_n, grp, test_set[i:i + static_n].sort_values(), i)
-            for i in range(len(test_set)-static_n + 1)
-            if self.dixon_q_test_algo(test_set[i:i + static_n],
-                                      self.find_comparator(test_set[i:i+static_n], confidence[VALUE])) is True
+            self.results_to_dict(static_n, grp, test_set[i+static_n:i + 2*static_n].sort_values(), i)
+            for i in range(len(test_set)-2*static_n + 1)
+            if self.dixon_q_test_algo(
+                test_set[i+static_n:i + 2*static_n],
+                self.find_comparator(test_set[i+static_n:i+2*static_n], confidence[VALUE])
+            ) is True
         ]
 
         return result
