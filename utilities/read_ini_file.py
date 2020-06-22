@@ -5,7 +5,7 @@ from static_files.standard_variable_names import MAIN_CONFIG
 
 
 class ReadIniFile:
-    config_file_path = '\\'.join([os.getcwd(), MAIN_CONFIG])
+    config_file_path = os.path.join(os.getcwd(), MAIN_CONFIG)
     config = ConfigParser()
     config.read(config_file_path)
 
