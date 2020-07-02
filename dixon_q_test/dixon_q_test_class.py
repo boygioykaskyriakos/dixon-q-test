@@ -32,15 +32,47 @@ class FindOutlierDixon(BaseClassAnalytic):
 
         # initialize local variables
         numbers = copy(numbers).sort_values().to_list()
+        len_numbers = len(numbers)
 
         q_lower = 0
         q_upper = 0
-        denominator = float(numbers[-1]-numbers[0])
+
+        if 3 > len_numbers:
+            raise ValueError("Change length of numbers")
+
+        elif 3 <= len_numbers <= 7:
+            upper_numerator = float(numbers[-1] - numbers[-2])
+            lower_numerator = float(numbers[1] - numbers[0])
+
+            denominator_lower = denominator_upper = float(numbers[-1]-numbers[0])
+
+        elif 8 <= len_numbers <= 10:
+            upper_numerator = float(numbers[-1] - numbers[-2])
+            denominator_upper = float(numbers[-1] - numbers[1])
+
+            lower_numerator = float(numbers[1] - numbers[0])
+            denominator_lower = float(numbers[-2] - numbers[0])
+
+        elif 11 <= len_numbers <= 13:
+            upper_numerator = float(numbers[-1] - numbers[-3])
+            denominator_upper = float(numbers[-1] - numbers[1])
+
+            lower_numerator = float(numbers[2] - numbers[0])
+            denominator_lower = float(numbers[-2] - numbers[0])
+
+        else:  # 14 <= len_numbers
+            upper_numerator = float(numbers[-1] - numbers[-3])
+            denominator_upper = float(numbers[-1] - numbers[2])
+
+            lower_numerator = float(numbers[2] - numbers[0])
+            denominator_lower = float(numbers[-3] - numbers[0])
 
         # apply dixon q test algorithm logic
-        if denominator > 0:
-            q_lower = float(numbers[1] - numbers[0]) / denominator
-            q_upper = float(numbers[-1] - numbers[-2]) / denominator
+        if denominator_lower > 0:
+            q_lower = lower_numerator / denominator_lower
+
+        if denominator_upper > 0:
+            q_upper = upper_numerator / denominator_upper
 
         if q_lower > comparator or q_upper > comparator:
             return True
