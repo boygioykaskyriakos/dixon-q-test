@@ -45,7 +45,7 @@ class FindOutlierDixon(BaseClassAnalytic):
             upper_numerator = float(numbers[-1] - numbers[-2])
             # x_2 - x_1
             lower_numerator = float(numbers[1] - numbers[0])
-
+            #x_n - x_1
             denominator_lower = denominator_upper = float(numbers[-1]-numbers[0])
 
         elif 8 <= len_numbers <= 10:
