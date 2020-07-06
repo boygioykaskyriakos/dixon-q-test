@@ -39,25 +39,33 @@ class FindOutlierDixon(BaseClassAnalytic):
 
         if 3 > len_numbers:
             raise ValueError("Change length of numbers")
-
+        # r10
         elif 3 <= len_numbers <= 7:
+            # x_n - x_n-1
             upper_numerator = float(numbers[-1] - numbers[-2])
+            # x_2 - x_1
             lower_numerator = float(numbers[1] - numbers[0])
-
+            #x_n - x_1
             denominator_lower = denominator_upper = float(numbers[-1]-numbers[0])
-
+        # r11
         elif 8 <= len_numbers <= 10:
+            # x_n - x_n-1
             upper_numerator = float(numbers[-1] - numbers[-2])
+            # x_n - x_2
             denominator_upper = float(numbers[-1] - numbers[1])
-
+            # x_2 - x_1
             lower_numerator = float(numbers[1] - numbers[0])
+            # x_n-1 - x_1
             denominator_lower = float(numbers[-2] - numbers[0])
-
+        # r12
         elif 11 <= len_numbers <= 13:
+            # x_n - x_n-2
             upper_numerator = float(numbers[-1] - numbers[-3])
+            # x_n -x_2
             denominator_upper = float(numbers[-1] - numbers[1])
-
+            # x_3 - x_1
             lower_numerator = float(numbers[2] - numbers[0])
+            # x_n-1 - x_1
             denominator_lower = float(numbers[-2] - numbers[0])
 
         else:  # 14 <= len_numbers
