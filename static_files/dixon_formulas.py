@@ -71,7 +71,7 @@ r22 = {
 }
 
 
-def generic_formula(r, subset):
+def generic_formula_dixon_q_test(r, subset):
     upper_numerator = r[UPPER_NUMERATOR](subset)
     upper_denominator = r[UPPER_DENOMINATOR](subset)
     lower_numerator = r[LOWER_NUMERATOR](subset)

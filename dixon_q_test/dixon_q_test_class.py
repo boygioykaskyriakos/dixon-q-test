@@ -6,7 +6,7 @@ from base_class.base_class_analytic import BaseClassAnalytic
 from static_files.standard_variable_names import DATA_TYPE, NODE, VALUES, VALUE, KEY, \
     OUTLIER_NO, SUBSET, SUBSET_SIZE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT, TOTAL_PANICS, \
     HIGHER_RANGE_NUMBER, LOWER_RANGE_NUMBER, EXCEPTION
-from static_files.dixon_formulas import r0, r10, r11, r21, r22, generic_formula
+from static_files.dixon_formulas import r0, r10, r11, r21, r22, generic_formula_dixon_q_test
 
 
 class FindOutlierDixon(BaseClassAnalytic):
@@ -54,7 +54,7 @@ class FindOutlierDixon(BaseClassAnalytic):
             r = r22
 
         upper_numerator, upper_denominator, lower_numerator, lower_denominator = \
-            generic_formula(r, numbers)
+            generic_formula_dixon_q_test(r, numbers)
 
         # apply dixon q test algorithm logic
         if lower_denominator > 0:
