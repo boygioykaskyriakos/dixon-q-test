@@ -4,7 +4,9 @@ from copy import copy
 
 from base_class.base_class_analytic import BaseClassAnalytic
 from static_files.standard_variable_names import DATA_TYPE, NODE, VALUES, VALUE, KEY, \
-    OUTLIER_NO, SUBSET, SUBSET_SIZE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT, TOTAL_PANICS
+    OUTLIER_NO, SUBSET, SUBSET_SIZE, INDEX_FIRST_ELEMENT, INDEX_LAST_ELEMENT, TOTAL_PANICS, \
+    HIGHER_RANGE_NUMBER, LOWER_RANGE_NUMBER, EXCEPTION
+from static_files.dixon_formulas import r0, r10, r11, r21, r22, generic_formula
 
 
 class FindOutlierDixon(BaseClassAnalytic):
@@ -37,50 +39,29 @@ class FindOutlierDixon(BaseClassAnalytic):
         q_lower = 0
         q_upper = 0
 
-        if 3 > len_numbers:
-            raise ValueError("Change length of numbers")
+        if len_numbers < r0[HIGHER_RANGE_NUMBER]:
+            raise ValueError(r0[EXCEPTION])
         # r10
-        elif 3 <= len_numbers <= 7:
-            # x_n - x_n-1
-            upper_numerator = float(numbers[-1] - numbers[-2])
-            # x_2 - x_1
-            lower_numerator = float(numbers[1] - numbers[0])
-            #x_n - x_1
-            denominator_lower = denominator_upper = float(numbers[-1]-numbers[0])
+        elif r10[LOWER_RANGE_NUMBER] <= len_numbers <= r10[HIGHER_RANGE_NUMBER]:
+            r = r10
         # r11
-        elif 8 <= len_numbers <= 10:
-            # x_n - x_n-1
-            upper_numerator = float(numbers[-1] - numbers[-2])
-            # x_n - x_2
-            denominator_upper = float(numbers[-1] - numbers[1])
-            # x_2 - x_1
-            lower_numerator = float(numbers[1] - numbers[0])
-            # x_n-1 - x_1
-            denominator_lower = float(numbers[-2] - numbers[0])
-        # r12
-        elif 11 <= len_numbers <= 13:
-            # x_n - x_n-2
-            upper_numerator = float(numbers[-1] - numbers[-3])
-            # x_n -x_2
-            denominator_upper = float(numbers[-1] - numbers[1])
-            # x_3 - x_1
-            lower_numerator = float(numbers[2] - numbers[0])
-            # x_n-1 - x_1
-            denominator_lower = float(numbers[-2] - numbers[0])
+        elif r11[LOWER_RANGE_NUMBER] <= len_numbers <= r11[HIGHER_RANGE_NUMBER]:
+            r = r11
+        # r21
+        elif r21[LOWER_RANGE_NUMBER] <= len_numbers <= r21[HIGHER_RANGE_NUMBER]:
+            r = r21
+        else:   # r22[LOWER_RANGE_NUMBER] <= len_numbers
+            r = r22
 
-        else:  # 14 <= len_numbers
-            upper_numerator = float(numbers[-1] - numbers[-3])
-            denominator_upper = float(numbers[-1] - numbers[2])
-
-            lower_numerator = float(numbers[2] - numbers[0])
-            denominator_lower = float(numbers[-3] - numbers[0])
+        upper_numerator, upper_denominator, lower_numerator, lower_denominator = \
+            generic_formula(r, numbers)
 
         # apply dixon q test algorithm logic
-        if denominator_lower > 0:
-            q_lower = lower_numerator / denominator_lower
+        if lower_denominator > 0:
+            q_lower = lower_numerator / lower_denominator
 
-        if denominator_upper > 0:
-            q_upper = upper_numerator / denominator_upper
+        if upper_denominator > 0:
+            q_upper = upper_numerator / upper_denominator
 
         if q_lower > comparator or q_upper > comparator:
             return True
