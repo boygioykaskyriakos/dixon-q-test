@@ -1,16 +1,20 @@
+The project is a simple framework that applies outlier algorithms on integer datasets. 
+
+The current work was constructed to check data extracted from contiki OS cooja experiments. More specifically, nodes communicating in RPL exchange ICMP data regualarly. If there is an intruder in the network, those new incoming data will be outliers to the ordinary data series. 
+
+PARAMETERS:
+The project contains an .ini file that needs to be configured (look into folder config_files for the *.ini. Change the path for the data file accordingly (full_file_path=...).
+
 # Dixon Q-Test 
+Dixon's Q-test can easilly point out the outlier. Since it is light and easy to implement (it needs only a division), it is ideal to be running in the IoT part (Hybrid placement).
 Read more [here.](https://www.statisticshowto.com/dixons-q-test/)
 ## Arguments:
+1.
 data = An ordered or unordered list of data points (int or float).
 left = Q-test of minimum value in the ordered list if True.
 right = Q-test of maximum value in the ordered list if True.
 q_dict = A dictionary of Q-values for a given confidence level, where the dict. keys are sample sizes N, and the associated values are the corresponding critical Q values. E.g., {3: 0.97, 4: 0.829, 5: 0.71, 6: 0.625, ...} (Tables are provided, look [here](https://chem.libretexts.org/Bookshelves/Ancillary_Materials/Reference/Reference_Tables/Analytic_References/Appendix_06%3A_Critical_Values_for_Dixon%E2%80%99s_Q-Test) for details). 
 
-The current work was constructed to check data extracted from contiki OS cooja experiments. More specifically, nodes communicating in RPL exchange ICMP data regualarly. If there is an intruder in the network, those new incoming data will be outliers to the ordinary data series. Dixon's Q-test can easilly point out the outlier.
-
-The project is a simple framework that applies the Dixon Q-test algorithm on integer datasets. 
-PARAMETERS:
-1. The project contains an .ini file that needs to be configured (look into folder config_files for the *.ini. Change the path for the data file accordingly (full_file_path=...).
 2. Also you can set the search "window". Dixon q-test can have a memory (how many passed values to consider. The smallest is three (3) and can become bigger. Feel free to experiment with values until 15.
 [DIXON_Q_TEST_SUBSET_VARIABLES]
 static_n = 3
@@ -24,6 +28,11 @@ The important thing is the NODE and the VALUES columns.
 /* Denominator = (x[n]-x[1] */
 /* Lower Outlier: Q = (x[2]-x[1])/(x[n]-x[1]) */					
 /* Higher Outlier: Q = (x[n]-x[n-1])/(x[n]-x[1]) */
+
+
+
+# Chebyshev's Inequality
+
 
 ### date: 14-6-2020
 ### author: Kyriakos Vougioukas
